@@ -17,18 +17,19 @@ const App = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(24);
 
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const categoriesData = await getCategories();
       const websitesData = await getWebsites();
-      const { data, total } = await getSearch(
-        selectedCategory,
-        selectedWebsite,
+      const { data, total } = await getSearch({
+        category: selectedCategory,
+        website: selectedWebsite,
         searchValue,
         page,
         limit
-        );
+      });
       setSearchData(data);
       setTotal(total);
       setCategories(categoriesData);
@@ -41,14 +42,20 @@ const App = () => {
   useEffect(() => {
     const fetchSearchData = async () => {
       setLoading(true);
-      const { data, total } = await getSearch(selectedCategory, selectedWebsite, searchValue, page);
+      const { data, total } = await getSearch({
+        category: selectedCategory,
+        website: selectedWebsite,
+        searchValue,
+        page,
+        limit
+      });
       setSearchData(Array.isArray(data) ? data : []);
       setTotal(Number(total));
       setLoading(false);
     };
   
     fetchSearchData();
-  }, [selectedCategory, selectedWebsite, page]);
+  }, [selectedCategory, selectedWebsite, searchValue, page]);
 
   const handlePageChange = async (newPage: number) => {
     setPage(Number(newPage));
@@ -56,7 +63,13 @@ const App = () => {
 
   const handleSearch = async () => {
     setLoading(true);
-    const { data, total } = await getSearch(selectedCategory, selectedWebsite, searchValue, page, limit);
+    const { data, total } = await getSearch({
+      category: selectedCategory,
+      website: selectedWebsite,
+      searchValue,
+      page,
+      limit
+    });
     setSearchData(Array.isArray(data) ? data : []);
     setTotal(Number(total));
     setLoading(false);

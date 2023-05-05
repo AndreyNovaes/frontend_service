@@ -2,53 +2,64 @@ import apiClient from "./axiosClient";
 
 export const getCategories = async () => {
   const response = await apiClient.get("/categories");
-  return response.data;
+  const { categories } = response.data;
+  return categories;
 };
 
 export const getWebsites = async () => {
   const response = await apiClient.get("/websites");
-  return response.data;
+  const { websites } = response.data;
+  return websites;
 };
 
-export const getSearch = async (
-  category?: string,
-  website?: string,
-  searchValue?: string,
-  page?: number,
-  limit?: number
-) => {
+interface SearchParams {
+  category: string;
+  website: string;
+  searchValue: string;
+  page?: number;
+  limit?: number;
+}
+
+interface SearchParams {
+  category: string;
+  website: string;
+  searchValue: string;
+  page?: number;
+  limit?: number;
+}
+
+export const getSearch = async (searchParams: SearchParams) => {
   try {
-    let queryString = "";
+    const { category, website, searchValue, page, limit } = searchParams;
+
+    const params: Record<string, string | number> = {};
 
     if (category && category !== "Todos") {
-      queryString += `category=${encodeURIComponent(category)}&`;
+      params.category = category;
     }
 
     if (website && website !== "Todos") {
-      queryString += `website=${encodeURIComponent(website)}&`;
+      params.website = website;
     }
 
     if (searchValue) {
-      queryString += `search=${encodeURIComponent(searchValue)}&`;
+      params.search = searchValue;
     }
 
     if (page) {
-      queryString += `page=${encodeURIComponent(page)}&`;
+      params.page = page;
     }
 
     if (limit) {
-      queryString += `limit=${encodeURIComponent(limit)}&`;
+      params.limit = limit;
     }
 
-    queryString = queryString.slice(0, -1);
+    const response = await apiClient.get("/search", { params });
+    const { products } = response.data;
 
-    const response = await apiClient.get(`/search?${queryString}`);
-    const data = response.data;
-    return data
-
+    return products;
   } catch (error) {
     console.error("Error fetching search data:", error);
     throw error;
   }
 };
-
